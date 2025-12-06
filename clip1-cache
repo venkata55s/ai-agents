@@ -1,0 +1,187 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPS/2iXSrAG/XJ+grK6Mh0q",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/venkata55s/ai-agents/blob/main/clip1-cache\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 4,
+      "metadata": {
+        "id": "hOODldowLJoT"
+      },
+      "outputs": [],
+      "source": [
+        "# 1 - Import required libraries\n",
+        "from transformers import AutoTokenizer, AutoModel\n",
+        "\n",
+        "# 2 - Initialize tokenizer and model\n",
+        "tokenizer = AutoTokenizer.from_pretrained(\"bert-base-uncased\")\n",
+        "model = AutoModel.from_pretrained(\"bert-base-uncased\")\n",
+        "\n",
+        "# 3 - Tokenize the input text\n",
+        "inputs = tokenizer(\"hey there.. its Vidya!\", return_tensors=\"pt\")\n",
+        "\n",
+        "# 4 - Pass the tokenized input through the model\n",
+        "outputs = model(**inputs)\n",
+        "\n",
+        "# 5 - Outputs will include the last hidden states\n",
+        "print(outputs.last_hidden_state.shape)  # Shape: [batch_size, sequence_length, hidden_size]"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "abb689bd",
+        "outputId": "8fab73bb-927b-4715-9744-0d4d1c867b30"
+      },
+      "source": [
+        "input_text = \"hey there.. its Vidya!\"\n",
+        "tokens = tokenizer.tokenize(input_text)\n",
+        "print(f\"Original text: '{input_text}'\")\n",
+        "print(f\"Tokens: {tokens}\")"
+      ],
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Original text: 'hey there.. its Vidya!'\n",
+            "Tokens: ['hey', 'there', '.', '.', 'its', 'vi', '##dya', '!']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "861f4548"
+      },
+      "source": [
+        "### Purpose of `[CLS]` and `[SEP]` Tokens\n",
+        "\n",
+        "**`[CLS]` (Classification Token):**\n",
+        "\n",
+        "*   This special token is always inserted at the beginning of the input sequence.\n",
+        "*   Its primary purpose is to represent the aggregate meaning of the entire sequence for classification tasks. When using a BERT model for tasks like sentiment analysis or spam detection, the hidden state corresponding to the `[CLS]` token at the output layer is often used as the fixed-dimensional representation of the entire input sequence.\n",
+        "\n",
+        "**`[SEP]` (Separator Token):**\n",
+        "\n",
+        "*   This special token is used to mark the end of a sequence, or to separate two distinct segments (e.g., in tasks like question answering where you might have a question and a paragraph of text as input).\n",
+        "*   In your example, it simply marks the end of the single input sentence."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(outputs.last_hidden_state.shape)  # Shape: [batch_size, sequence_length, hidden_size]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3zgg22mhMapq",
+        "outputId": "94ab34ad-64a2-4f4e-e218-97ee19b89444"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "torch.Size([1, 10, 768])\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "Ze3NiwQ1UHYY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Explain the meaning of the output shape [1, 10, 768]\n",
+        "The output shape [1, 10, 768] from outputs.last_hidden_state.shape represents three key pieces of information from the BERT model's output:\n",
+        "\n",
+        "1 (Batch Size): This is the number of sequences (or sentences/texts) that were processed together in a single batch. In your case, you passed one input text (\"hey there.. its Vidya!\"), so the batch size is 1.\n",
+        "\n",
+        "10 (Sequence Length): This is the total number of tokens in your input sequence after it was tokenized by the bert-base-uncased tokenizer. This includes special tokens like [CLS] (at the beginning) and [SEP] (at the end). Your input \"hey there.. its Vidya!\" was broken down into 10 tokens.\n",
+        "\n",
+        "768 (Hidden Size / Embedding Dimension): This is the dimensionality of the vector representation (or embedding) for each token. In the bert-base-uncased model, each token is represented by a vector of 768 numbers. This vector captures the contextual meaning of the token within the sequence.\n",
+        "\n",
+        "So, in summary, you fed one sequence (1), which was tokenized into ten tokens (10), and each of those tokens is now represented by a 768-dimensional vector (768).\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "8yfAt1w2UH-Z"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "show me the tokens for \"hey there.. its Vidya!\". And whats the purpose of CLS and SEP tokens ?\n",
+        "Sure, let me show you the tokens generated for \"hey there.. its Vidya!\" and explain the purpose of the [CLS] and [SEP] tokens.\n",
+        "\n",
+        "Great! The tokens for \"hey there.. its Vidya!\" are: ['hey', 'there', '.', '.', 'its', 'vi', '##dya', '!'].\n",
+        "\n",
+        "I have also provided an explanation for the [CLS] and [SEP] tokens in the text cell above."
+      ],
+      "metadata": {
+        "id": "MAjb5PC5UWpa"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "whats the significance of # in this token '##dya', and what it represents\n",
+        "That's a great question! The ## prefix in a token like '##dya' has a specific significance in the tokenization process used by models like BERT, which often employ a technique called WordPiece tokenization.\n",
+        "\n",
+        "Subword Tokenization: Instead of just splitting text into full words (like Vidya) or individual characters (V, i, d, y, a), WordPiece tokenization breaks down words into smaller, common subword units.\n",
+        "\n",
+        "Meaning of ##: The ## prefix indicates that the token is a continuation of a previous token and not the start of a new word. So, when you see 'vi' and then '##dya', it means they should be combined to form the original word Vidya.\n",
+        "\n",
+        "Why is this done?\n",
+        "\n",
+        "Handling Out-of-Vocabulary (OOV) words: It allows the model to represent rare or unknown words by breaking them down into known subword units. For example, if 'Vidya' wasn't in the vocabulary, the model could still understand its components vi and ##dya.\n",
+        "Reducing Vocabulary Size: It helps to keep the vocabulary size manageable while still being able to represent a vast number of words.\n",
+        "Capturing Morphological Information: Subwords can sometimes capture morphological information (e.g., prefixes, suffixes, root words), which can be useful for understanding meaning."
+      ],
+      "metadata": {
+        "id": "iJlMXBpYUdDh"
+      }
+    }
+  ]
+}
